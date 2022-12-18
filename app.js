@@ -17,7 +17,9 @@ app.get("/", (req, res) => {
 });
 
 const usersRoute = require("./routes/users");
+const cowsRoute = require("./routes/cows");
 app.use("/api/users/", usersRoute);
+app.use("/api/cows/", cowsRoute);
 
 //404 route
 app.use("*", (req, res) => {

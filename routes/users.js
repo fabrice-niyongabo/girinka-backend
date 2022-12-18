@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 const auth = require("../middleware/auth");
+const protectRoute = require("../middleware/protectRoutes");
 
 const Users = require("../model/users");
 
@@ -65,10 +66,10 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/updateInfo/", auth, (req, res) => {
-  const { name, phone } = req.body;
+  const { fullName, phone } = req.body;
   Users.updateOne(
     { _id: req.user.user_id },
-    { fullName: name, phone },
+    { fullName, phone },
     (err, result) => {
       if (err) {
         return res.status(400).send({ msg: err.message });
@@ -77,6 +78,17 @@ router.post("/updateInfo/", auth, (req, res) => {
       }
     }
   );
+});
+
+router.delete("/:id", auth, (req, res) => {
+  const id = req.params["id"];
+  Users.deleteOne({ _id: id }, (err, result) => {
+    if (err) {
+      return res.status(400).send({ msg: err.message });
+    } else {
+      res.status(200).send({ msg: "User deleted successfull", result });
+    }
+  });
 });
 
 // admin
@@ -120,9 +132,9 @@ router.post("/updatePassword/", auth, async (req, res) => {
   }
 });
 
-router.post("/getAll/", auth, async (req, res) => {
+router.get("/", auth, protectRoute(["admin"]), async (req, res) => {
   try {
-    const users = await Users.find({ role: "user" });
+    const users = await Users.find({ role: { $ne: "admin" } });
     res.status(200).send({
       users,
     });
@@ -131,7 +143,7 @@ router.post("/getAll/", auth, async (req, res) => {
   }
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", auth, protectRoute(["admin"]), async (req, res) => {
   try {
     // Get user input
     const { fullName, email, password, phone, role, roleId, companyName } =
@@ -196,12 +208,8 @@ router.post("/register", async (req, res) => {
       status: "success",
       msg: "User created successfull!",
       user: {
-        phone,
-        email,
-        fullName,
-        companyName: user.companyName,
-        role: user.role,
-        token: user.token,
+        ...user._doc,
+        password: "",
       },
     });
   } catch (err) {
