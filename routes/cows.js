@@ -59,6 +59,14 @@ router.post("/", auth, protectRoutes(["district"]), async (req, res) => {
 router.delete("/:id", auth, protectRoutes(["district"]), async (req, res) => {
   try {
     const id = req.params["id"];
+    const trans = await Cows.findOne({ _id: id, isTransfered: true });
+    if (trans) {
+      return res
+        .status(400)
+        .send({
+          msg: "You can not delete a cow which has been already transfered",
+        });
+    }
     await Cows.deleteOne({ _id: id });
     return res.status(200).send({ msg: "Cow delete successfull." });
   } catch (error) {

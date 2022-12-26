@@ -18,8 +18,10 @@ app.get("/", (req, res) => {
 
 const usersRoute = require("./routes/users");
 const cowsRoute = require("./routes/cows");
+const sectorRoute = require("./routes/sector");
 app.use("/api/users/", usersRoute);
 app.use("/api/cows/", cowsRoute);
+app.use("/api/sector/", sectorRoute);
 
 //404 route
 app.use("*", (req, res) => {
