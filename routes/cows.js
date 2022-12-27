@@ -6,6 +6,7 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 
 const Cows = require("../model/cows");
+const Candidates = require("../model/candidates");
 const protectRoutes = require("../middleware/protectRoutes");
 const getUserLocation = require("../middleware/getUserLocation");
 
@@ -61,11 +62,9 @@ router.delete("/:id", auth, protectRoutes(["district"]), async (req, res) => {
     const id = req.params["id"];
     const trans = await Cows.findOne({ _id: id, isTransfered: true });
     if (trans) {
-      return res
-        .status(400)
-        .send({
-          msg: "You can not delete a cow which has been already transfered",
-        });
+      return res.status(400).send({
+        msg: "You can not delete a cow which has been already transfered",
+      });
     }
     await Cows.deleteOne({ _id: id });
     return res.status(200).send({ msg: "Cow delete successfull." });
@@ -81,7 +80,16 @@ router.get(
   async (req, res) => {
     const loc = getUserLocation(req);
     try {
-      const cows = await Cows.find(loc);
+      const cows = [];
+      const cws = await Cows.find(loc);
+      for (let i = 0; i < cws.length; i++) {
+        if (cws[i].isGiven) {
+          const candidate = await Candidates.findOne({ _id: cws[i].givenTo });
+          cows.push({ ...cws[i]._doc, candidate });
+        } else {
+          cows.push({ ...cws[i]._doc, candidate: {} });
+        }
+      }
       return res.status(200).send({ cows });
     } catch (error) {
       return res.status(400).send({ msg: error.message });

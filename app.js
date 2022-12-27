@@ -19,9 +19,13 @@ app.get("/", (req, res) => {
 const usersRoute = require("./routes/users");
 const cowsRoute = require("./routes/cows");
 const sectorRoute = require("./routes/sector");
+const cellRoute = require("./routes/cell");
+const candidatesRoute = require("./routes/candidates");
 app.use("/api/users/", usersRoute);
 app.use("/api/cows/", cowsRoute);
 app.use("/api/sector/", sectorRoute);
+app.use("/api/cell/", cellRoute);
+app.use("/api/candidates/", candidatesRoute);
 
 //404 route
 app.use("*", (req, res) => {

@@ -18,7 +18,7 @@ const getUserLocation = (req) => {
       cell: res[3],
     };
   }
-  if (role == "cell") {
+  if (role == "village") {
     const res = roleId.split("-");
     return {
       province: res[0],
