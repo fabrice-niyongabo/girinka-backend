@@ -98,10 +98,10 @@ router.get("/", auth, async (req, res) => {
     const cw = await Candidates.find(loc);
     for (let i = 0; i < cw.length; i++) {
       if (cw[i].cowStatus !== "Waiting") {
-        const cow = await Cows.findOne({ _id: cw[i].cowId });
+        const cow = await Cows.findOne({ _id: cw[i].assignedCow });
         candidates.push({ ...cw[i]._doc, cow });
       } else {
-        candidates.push({ ...cw[i]._doc });
+        candidates.push({ ...cw[i]._doc, cow: {} });
       }
     }
     return res.status(200).send({ candidates });

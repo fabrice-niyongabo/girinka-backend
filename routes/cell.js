@@ -25,15 +25,15 @@ router.put(
       }
       const { province, district, sector, cell } = getUserLocation(req);
       const up = await Candidates.updateOne(
-        { _id: id, province, district, sector, cell },
+        { _id: id, province, district, sector, cell, cowStatus: "Waiting" },
         { cellApproval: status, cellApprovalDescription: description }
       );
       if (up.matchedCount > 0) {
         return res.status(201).send({ msg: "Candidate updated!.", up });
       }
-      return res
-        .status(400)
-        .send({ msg: "Something went wrong, try again later after sometime." });
+      return res.status(400).send({
+        msg: "Can not modify candidate which has been approved sector.",
+      });
     } catch (error) {
       return res.status(400).send({ msg: error.message });
     }

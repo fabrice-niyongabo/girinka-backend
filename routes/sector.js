@@ -45,6 +45,46 @@ router.post(
     }
   }
 );
+
+router.put(
+  "/assign/",
+  auth,
+  protectRoutes(["district", "sector"]),
+  async (req, res) => {
+    try {
+      const { cowId, cowUserId } = req.body;
+      if (!(cowId && cowUserId)) {
+        return res
+          .status(400)
+          .send({ msg: "Please provide all the information for the cow." });
+      }
+      const { province, district, sector } = getUserLocation(req);
+      await Cows.updateOne(
+        { _id: cowId },
+        { isGiven: true, givenTo: cowUserId }
+      );
+
+      await SectorCows.updateOne(
+        { cowId },
+        {
+          isGiven: true,
+          givenTo: cowUserId,
+        }
+      );
+      await Candidates.updateOne(
+        { _id: cowUserId, cowStatus: "Waiting", province, district, sector },
+        {
+          cowStatus: "Given",
+          assignedCow: cowId,
+        }
+      );
+      return res.status(201).send({ msg: "Cow updated successfull." });
+    } catch (error) {
+      return res.status(400).send({ msg: error.message });
+    }
+  }
+);
+
 router.put("/", auth, protectRoutes(["sector"]), async (req, res) => {
   try {
     const { cowId } = req.body;
@@ -87,16 +127,16 @@ router.put(
       }
       const { province, district, sector } = getUserLocation(req);
       const up = await Candidates.updateOne(
-        { _id: id, province, district, sector },
+        { _id: id, province, district, sector, cowStatus: "Waiting" },
         { sectorApproval: status, sectorApprovalDescription: description }
       );
       if (up.matchedCount > 0) {
         return res.status(201).send({ msg: "Candidate udpdated!.", up });
       }
       console.log(up);
-      return res
-        .status(400)
-        .send({ msg: "Something went wrong, try again later after sometime." });
+      return res.status(400).send({
+        msg: "Candidate has already given a cow. no more modifications",
+      });
     } catch (error) {
       return res.status(400).send({ msg: error.message });
     }
