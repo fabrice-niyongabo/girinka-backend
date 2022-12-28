@@ -79,7 +79,7 @@ router.delete(
         cellApproval: "Pending",
         sectorApproval: "Pending",
       });
-      if (up) {
+      if (up.deletedCount > 0) {
         return res.status(201).send({ msg: "Candidate removed successful." });
       }
       return res.status(400).send({
