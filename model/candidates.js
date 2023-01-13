@@ -11,7 +11,7 @@ const candidatesSchema = new mongoose.Schema(
       maxlength: 16,
     },
     ubudeheCategory: { type: String, required: true },
-    phone: { type: String, unique: true },
+    phone: { type: String },
     martialStatus: { type: String, required: true },
     cowStatus: {
       type: String,
@@ -20,6 +20,7 @@ const candidatesSchema = new mongoose.Schema(
       enum: ["Given", "Waiting"],
     },
     assignedCow: { type: String, required: true, default: "-" },
+    assignedCowStatus: { type: String, required: true, default: "Normal" },
     province: { type: String, required: true },
     district: { type: String, required: true },
     sector: { type: String, required: true },

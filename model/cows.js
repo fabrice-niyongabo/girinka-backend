@@ -14,6 +14,7 @@ const cowSchema = new mongoose.Schema({
   registrationKg: { type: String, required: true },
   supplierName: { type: String, required: true },
   createdAt: { type: String, default: new Date() },
+  cowStatus: { type: String, required: true, default: "Normal" },
 });
 
 module.exports = mongoose.model("cows", cowSchema);
