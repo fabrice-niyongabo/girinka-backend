@@ -50,9 +50,16 @@ router.get("/", auth, async (req, res) => {
     const announcements = await Announcements.find({
       userId: req.user.user_id,
     });
-    return res
-      .status(200)
-      .send({ msg: "Announcement delete successfull.", announcements });
+    return res.status(200).send({ msg: "Announcements.", announcements });
+  } catch (error) {
+    return res.status(400).send({ msg: error.message });
+  }
+});
+
+router.get("/all/", async (req, res) => {
+  try {
+    const announcements = await Announcements.find({});
+    return res.status(200).send({ msg: "Announcements.", announcements });
   } catch (error) {
     return res.status(400).send({ msg: error.message });
   }
